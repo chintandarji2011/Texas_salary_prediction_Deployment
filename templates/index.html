@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Texas Salary Prediction</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .error {
+            margin-top: 25px;
+            padding: 15px;
+            background: #ffebee;
+            color: #b71c1c;
+            border-radius: 6px;
+        }
+            .result-item {
+            margin: 15px 0;
+            padding: 12px;
+        }
+        
+        .result-item span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .result-item strong {
+            font-size: 20px;
+        }
+        
+        .prediction-result {
+            font-size: 22px;
+        }    
+    </style>
+    
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Texas Employee Salary Prediction</h1>
+
+    <p class="subtitle">
+        Predict Annual Salary using Machine Learning
+    </p>
+
+    <form action="/predict" method="POST">
+
+        <!-- Agency -->
+        <div class="form-group">
+            <label for="agency">Agency</label>
+            <select id="agency"
+                    name="agency"
+                     required>
+
+                <option value="">-- Select Agency --</option>
+
+                {% for agency in agency_options %}
+                    <option value="{{ agency }}">{{ agency }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+
+        <!-- Class Title -->
+        <div class="form-group">
+            <label for="class_title">Class Title</label>
+            <select id="class_title"
+                    name="class_title"
+                    required>
+
+                <option value="">-- Select Class Title --</option>
+
+                {% for title in class_titles %}
+                    <option value="{{ title }}">{{ title }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+
+        <!-- Hourly Rate -->
+        <div class="form-group">
+        
+            <label for="hrly_rate">
+                Hourly Rate
+                <span class="limit">(0 – 117.79)</span>
+            </label>
+        
+            <input type="number"
+                   step="0.01"
+                   min="0"
+                   max="117.79"
+                   id="hrly_rate"
+                   name="hrly_rate"
+                   placeholder="Enter hourly rate"
+                   required>
+        
+        </div>
+
+       <!-- Hours Per Week -->
+        <div class="form-group">
+        
+            <label for="hrs_per_wk">
+                Hours Per Week
+                <span class="limit">(1 – 70)</span>
+            </label>
+        
+            <input type="number"
+                   min="1"
+                   max="70"
+                   id="hrs_per_wk"
+                   name="hrs_per_wk"
+                   placeholder="Enter hours per week"
+                   required>
+        
+        </div>
+
+
+        <!-- State Number -->
+        <div class="form-group">
+            <label for="state_number">State Number</label>
+            <input type="number"
+                   id="state_number"
+                   name="state_number"
+                   placeholder="Enter state number"
+                   required>
+        </div>
+
+
+       <!-- Status -->
+        <div class="form-group">
+            <label for="status">Employment Status</label>
+
+            <select id="status"
+                    name="status"
+                    required>
+
+                <option value="">-- Select Status --</option>
+
+                <option value="CRF - CLASSIFIED REGULAR FULL-TIME">
+                    CRF - CLASSIFIED REGULAR FULL-TIME
+                </option>
+
+                <option value="URF - UNCLASSIFIED REGULAR FULL-TIME">
+                    URF - UNCLASSIFIED REGULAR FULL-TIME
+                </option>
+
+                <option value="CRP - CLASSIFIED REGULAR PART-TIME">
+                    CRP - CLASSIFIED REGULAR PART-TIME
+                </option>
+
+                <option value="CTF - CLASSIFIED TEMPORARY FULL-TIME">
+                    CTF - CLASSIFIED TEMPORARY FULL-TIME
+                </option>
+
+                <option value="URP - UNCLASSIFIED REGULAR PART-TIME">
+                    URP - UNCLASSIFIED REGULAR PART-TIME
+                </option>
+
+                <option value="ERF - EXEMPT REGULAR FULL-TIME">
+                    ERF - EXEMPT REGULAR FULL-TIME
+                </option>
+
+            </select>
+        </div>
+
+
+        <!-- Ethnicity -->
+        <div class="form-group">
+            <label for="ethnicity">Ethnicity</label>
+
+            <select id="ethnicity"
+                    name="ethnicity"
+                    required>
+
+                <option value="">-- Select Ethnicity --</option>
+                <option value="ASIAN">ASIAN</option>
+                <option value="BLACK">BLACK</option>
+                <option value="HISPANIC">HISPANIC</option>
+                <option value="OTHER">OTHER</option>
+                <option value="WHITE">WHITE</option>
+                <option value="AM INDIAN">AM INDIAN</option>
+
+            </select>
+        </div>
+
+
+        <!-- Gender -->
+        <div class="form-group">
+            <label for="gender">Gender</label>
+
+            <select id="gender"
+                    name="gender"
+                    required>
+
+                <option value="">-- Select Gender --</option>
+                <option value="MALE">MALE</option>
+                <option value="FEMALE">FEMALE</option>
+
+            </select>
+        </div>
+
+
+        <!-- Employment Date -->
+        <div class="form-group">
+            <label for="employ_date">Employment Date</label>
+
+            <input type="date"
+                   id="employ_date"
+                   name="employ_date"
+                   required>
+        </div>
+
+
+        <!-- Predict -->
+        <button type="submit">
+            Predict Annual Salary
+        </button>
+
+    </form>
+
+
+    <!-- Prediction Result -->
+
+    {% if prediction %}
+    
+    <div class="result">
+    
+        <h2>Prediction Result</h2>
+    
+                                                                          
+        <div class="result-item prediction-result">
+    
+            <span>Predicted Annual Salary</span>
+    
+            <strong>{{ prediction }}</strong>
+    
+        </div>
+    
+    </div>
+    
+    {% endif %}
+
+    <!-- Error -->
+
+    {% if error %}
+
+    <div class="error">
+
+        <strong>Error:</strong>
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>

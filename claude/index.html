@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas Salary Prediction</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            padding: 30px 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: auto;
+            background: white;
+            padding: 36px 32px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 22px;
+            color: #1e3a5f;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        /* ── Section headings ── */
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #2563eb;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 6px;
+            margin: 24px 0 14px;
+        }
+
+        /* ── Form grid ── */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+
+        label .hint {
+            font-weight: 400;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            font-size: 14px;
+            color: #111827;
+            background: #fff;
+            transition: border 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+        }
+
+        /* ── Auto-computed info box ── */
+        .auto-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-size: 13px;
+            color: #0369a1;
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .auto-info strong { color: #0c4a6e; }
+
+        /* ── Optional extra jobs ── */
+        .optional-box {
+            background: #fafafa;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .optional-box label { color: #6b7280; }
+
+        /* ── Submit button ── */
+        button[type="submit"] {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            letter-spacing: 0.01em;
+            transition: background 0.2s;
+        }
+
+        button[type="submit"]:hover { background: #1d4ed8; }
+
+        /* ── Result card ── */
+        .result {
+            margin-top: 28px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #bbf7d0;
+        }
+
+        .result-header {
+            background: #16a34a;
+            color: white;
+            padding: 12px 18px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .result-body {
+            background: #f0fdf4;
+            padding: 18px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .result-item {
+            background: white;
+            border: 1px solid #d1fae5;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+
+        .result-item .r-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .result-item .r-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .prediction-big {
+            background: #16a34a;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            color: white;
+        }
+
+        .prediction-big .r-label {
+            font-size: 13px;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+
+        .prediction-big .r-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* ── Error ── */
+        .error {
+            margin-top: 24px;
+            padding: 14px 16px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            color: #991b1b;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>🤠 Texas Employee Salary Prediction</h1>
+    <p class="subtitle">Predict Annual Salary using Machine Learning — enter what you know, we compute the rest</p>
+
+    <form action="/predict" method="POST">
+
+        <!-- ── SECTION 1: Job Details ── -->
+        <div class="section-title">Job Details</div>
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="agency">Agency</label>
+                <select id="agency" name="agency" required>
+                    <option value="">-- Select Agency --</option>
+                    {% for ag in agency_options %}
+                        <option value="{{ ag.value }}">{{ ag.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="class_title">Class Title</label>
+                <select id="class_title" name="class_title" required>
+                    <option value="">-- Select Class Title --</option>
+                    {% for title in class_titles %}
+                        <option value="{{ title }}">{{ title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="hrs_per_wk">
+                    Hours Per Week
+                    <span class="hint">(1 – 70)</span>
+                </label>
+                <input type="number" id="hrs_per_wk" name="hrs_per_wk"
+                       min="1" max="70" placeholder="e.g. 40" required>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Employment Status</label>
+                <select id="status" name="status" required>
+                    <option value="">-- Select Status --</option>
+                    <option value="CRF - CLASSIFIED REGULAR FULL-TIME">CRF – Classified Regular Full-Time</option>
+                    <option value="URF - UNCLASSIFIED REGULAR FULL-TIME">URF – Unclassified Regular Full-Time</option>
+                    <option value="CRP - CLASSIFIED REGULAR PART-TIME">CRP – Classified Regular Part-Time</option>
+                    <option value="CTF - CLASSIFIED TEMPORARY FULL-TIME">CTF – Classified Temporary Full-Time</option>
+                    <option value="URP - UNCLASSIFIED REGULAR PART-TIME">URP – Unclassified Regular Part-Time</option>
+                    <option value="ERF - EXEMPT REGULAR FULL-TIME">ERF – Exempt Regular Full-Time</option>
+                    <option value="CTP - CLASSIFIED TEMPORARY PART-TIME">CTP – Classified Temporary Part-Time</option>
+                    <option value="UTP - UNCLASSIFIED TEMPORARY PART-TIME">UTP – Unclassified Temporary Part-Time</option>
+                    <option value="UTF - UNCLASSIFIED TEMPORARY FULL-TIME">UTF – Unclassified Temporary Full-Time</option>
+                    <option value="ERP - EXEMPT REGULAR PART-TIME">ERP – Exempt Regular Part-Time</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="employ_date">Employment Start Date</label>
+                <input type="date" id="employ_date" name="employ_date" required>
+            </div>
+
+        </div>
+
+
+        <!-- ── SECTION 2: Salary ── -->
+        <div class="section-title">Salary Information</div>
+
+        <div class="auto-info">
+            💡 <strong>Enter your Monthly Salary only.</strong>
+            Annual salary, hourly rate, and total compensation are
+            <strong>automatically calculated</strong> — no guessing needed.
+        </div>
+
+        <div class="form-row">
+            <div class="form-group full">
+                <label for="monthly_salary">
+                    Monthly Salary ($)
+                    <span class="hint">Your gross monthly pay for this job</span>
+                </label>
+                <input type="number" id="monthly_salary" name="monthly_salary"
+                       step="0.01" min="50" placeholder="e.g. 4000" required>
+            </div>
+        </div>
+
+        <!-- Optional: second job -->
+        <div class="optional-box">
+            <div class="form-group">
+                <label for="other_jobs_annual">
+                    Annual Salary from Other State Jobs
+                    <span class="hint"> — optional, leave blank if you hold only one job</span>
+                </label>
+                <input type="number" id="other_jobs_annual" name="other_jobs_annual"
+                       step="0.01" min="0" placeholder="e.g. 15000 (leave blank if none)">
+            </div>
+        </div>
+
+
+        <!-- ── SECTION 3: Personal Info ── -->
+        <div class="section-title">Personal Information</div>
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="ethnicity">Ethnicity</label>
+                <select id="ethnicity" name="ethnicity" required>
+                    <option value="">-- Select --</option>
+                    <option value="WHITE">WHITE</option>
+                    <option value="HISPANIC">HISPANIC</option>
+                    <option value="BLACK">BLACK</option>
+                    <option value="ASIAN">ASIAN</option>
+                    <option value="OTHER">OTHER</option>
+                    <option value="AM INDIAN">AM INDIAN</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                    <option value="">-- Select --</option>
+                    <option value="FEMALE">FEMALE</option>
+                    <option value="MALE">MALE</option>
+                </select>
+            </div>
+
+        </div>
+
+
+        <!-- ── Submit ── -->
+        <button type="submit">🔍 Predict Annual Salary</button>
+
+    </form>
+
+
+    <!-- ── Result ── -->
+    {% if prediction %}
+    <div class="result">
+        <div class="result-header">✅ Prediction Result</div>
+        <div class="result-body">
+
+            <div class="result-grid">
+
+                <div class="result-item">
+                    <div class="r-label">Monthly Salary (entered)</div>
+                    <div class="r-value">{{ monthly_entered }}</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="r-label">Annual Salary (computed)</div>
+                    <div class="r-value">{{ annual_computed }}</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="r-label">Total Across All Jobs</div>
+                    <div class="r-value">{{ summed_computed }}</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="r-label">Hourly Rate (computed)</div>
+                    <div class="r-value">{{ hrly_rate_computed }}/hr</div>
+                </div>
+
+                <div class="result-item">
+                    <div class="r-label">Experience</div>
+                    <div class="r-value">{{ experience_computed }}</div>
+                </div>
+
+            </div>
+
+            <div class="prediction-big">
+                <div class="r-label">🤖 ML Predicted Annual Salary</div>
+                <div class="r-value">{{ prediction }}</div>
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+
+
+    <!-- ── Error ── -->
+    {% if error %}
+    <div class="error">
+        <strong>⚠️ Error:</strong> {{ error }}
+    </div>
+    {% endif %}
+
+</div>
+</body>
+</html>
