@@ -71,6 +71,7 @@
 
         .result {
             margin-top: 25px;
+            margin-bottom: 25px;
             padding: 15px;
             background: #e8f5e9;
             border-radius: 6px;
@@ -79,6 +80,7 @@
 
         .error {
             margin-top: 25px;
+            margin-bottom: 25px;
             padding: 15px;
             background: #ffebee;
             color: #b71c1c;
@@ -115,6 +117,39 @@
         Predict Annual Salary using Machine Learning
     </p>
 
+    <!-- Prediction Result (shown ABOVE the form) -->
+
+    {% if prediction %}
+
+    <div class="result">
+
+        <h2>Prediction Result</h2>
+
+        <div class="result-item prediction-result">
+
+            <span>Predicted Annual Salary</span>
+
+            <strong>{{ prediction }}</strong>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <!-- Error (shown ABOVE the form) -->
+
+    {% if error %}
+
+    <div class="error">
+
+        <strong>Error:</strong>
+        {{ error }}
+
+    </div>
+
+    {% endif %}
+
     <form action="/predict" method="POST">
 
         <!-- Agency -->
@@ -127,7 +162,7 @@
                 <option value="">-- Select Agency --</option>
 
                 {% for agency in agency_options %}
-                    <option value="{{ agency }}">{{ agency }}</option>
+                    <option value="{{ agency }}" {% if agency|string == request.form.get('agency') %}selected{% endif %}>{{ agency }}</option>
                 {% endfor %}
 
             </select>
@@ -144,7 +179,7 @@
                 <option value="">-- Select Class Title --</option>
 
                 {% for title in class_titles %}
-                    <option value="{{ title }}">{{ title }}</option>
+                    <option value="{{ title }}" {% if title == request.form.get('class_title') %}selected{% endif %}>{{ title }}</option>
                 {% endfor %}
 
             </select>
@@ -166,6 +201,7 @@
                    id="hrly_rate"
                    name="hrly_rate"
                    placeholder="Enter hourly rate"
+                   value="{{ request.form.get('hrly_rate', '') }}"
                    required>
         
         </div>
@@ -184,6 +220,7 @@
                    id="hrs_per_wk"
                    name="hrs_per_wk"
                    placeholder="Enter hours per week"
+                   value="{{ request.form.get('hrs_per_wk', '') }}"
                    required>
         
         </div>
@@ -196,6 +233,7 @@
                    id="state_number"
                    name="state_number"
                    placeholder="Enter state number"
+                   value="{{ request.form.get('state_number', '') }}"
                    required>
         </div>
 
@@ -210,27 +248,27 @@
 
                 <option value="">-- Select Status --</option>
 
-                <option value="CRF - CLASSIFIED REGULAR FULL-TIME">
+                <option value="CRF - CLASSIFIED REGULAR FULL-TIME" {% if request.form.get('status') == 'CRF - CLASSIFIED REGULAR FULL-TIME' %}selected{% endif %}>
                     CRF - CLASSIFIED REGULAR FULL-TIME
                 </option>
 
-                <option value="URF - UNCLASSIFIED REGULAR FULL-TIME">
+                <option value="URF - UNCLASSIFIED REGULAR FULL-TIME" {% if request.form.get('status') == 'URF - UNCLASSIFIED REGULAR FULL-TIME' %}selected{% endif %}>
                     URF - UNCLASSIFIED REGULAR FULL-TIME
                 </option>
 
-                <option value="CRP - CLASSIFIED REGULAR PART-TIME">
+                <option value="CRP - CLASSIFIED REGULAR PART-TIME" {% if request.form.get('status') == 'CRP - CLASSIFIED REGULAR PART-TIME' %}selected{% endif %}>
                     CRP - CLASSIFIED REGULAR PART-TIME
                 </option>
 
-                <option value="CTF - CLASSIFIED TEMPORARY FULL-TIME">
+                <option value="CTF - CLASSIFIED TEMPORARY FULL-TIME" {% if request.form.get('status') == 'CTF - CLASSIFIED TEMPORARY FULL-TIME' %}selected{% endif %}>
                     CTF - CLASSIFIED TEMPORARY FULL-TIME
                 </option>
 
-                <option value="URP - UNCLASSIFIED REGULAR PART-TIME">
+                <option value="URP - UNCLASSIFIED REGULAR PART-TIME" {% if request.form.get('status') == 'URP - UNCLASSIFIED REGULAR PART-TIME' %}selected{% endif %}>
                     URP - UNCLASSIFIED REGULAR PART-TIME
                 </option>
 
-                <option value="ERF - EXEMPT REGULAR FULL-TIME">
+                <option value="ERF - EXEMPT REGULAR FULL-TIME" {% if request.form.get('status') == 'ERF - EXEMPT REGULAR FULL-TIME' %}selected{% endif %}>
                     ERF - EXEMPT REGULAR FULL-TIME
                 </option>
 
@@ -247,12 +285,24 @@
                     required>
 
                 <option value="">-- Select Ethnicity --</option>
-                <option value="ASIAN">ASIAN</option>
-                <option value="BLACK">BLACK</option>
-                <option value="HISPANIC">HISPANIC</option>
-                <option value="OTHER">OTHER</option>
-                <option value="WHITE">WHITE</option>
-                <option value="AM INDIAN">AM INDIAN</option>
+                <option value="ASIAN" {% if request.form.get('ethnicity') == 'ASIAN' %}selected{% endif %}>
+                    ASIAN
+                </option>
+                <option value="BLACK" {% if request.form.get('ethnicity') == 'BLACK' %}selected{% endif %}>
+                    BLACK
+                </option>
+                <option value="HISPANIC" {% if request.form.get('ethnicity') == 'HISPANIC' %}selected{% endif %}>
+                    HISPANIC
+                </option>
+                <option value="OTHER" {% if request.form.get('ethnicity') == 'OTHER' %}selected{% endif %}>
+                    OTHER
+                </option>
+                <option value="WHITE" {% if request.form.get('ethnicity') == 'WHITE' %}selected{% endif %}>
+                    WHITE
+                </option>
+                <option value="AM INDIAN" {% if request.form.get('ethnicity') == 'AM INDIAN' %}selected{% endif %}>
+                    AM INDIAN
+                </option>
 
             </select>
         </div>
@@ -267,8 +317,8 @@
                     required>
 
                 <option value="">-- Select Gender --</option>
-                <option value="MALE">MALE</option>
-                <option value="FEMALE">FEMALE</option>
+                <option value="MALE" {% if request.form.get('gender') == 'MALE' %}selected{% endif %}>MALE</option>
+                <option value="FEMALE" {% if request.form.get('gender') == 'FEMALE' %}selected{% endif %}>FEMALE</option>
 
             </select>
         </div>
@@ -281,6 +331,7 @@
             <input type="date"
                    id="employ_date"
                    name="employ_date"
+                   value="{{ request.form.get('employ_date', '') }}"
                    required>
         </div>
 
@@ -291,41 +342,6 @@
         </button>
 
     </form>
-
-
-    <!-- Prediction Result -->
-
-    {% if prediction %}
-    
-    <div class="result">
-    
-        <h2>Prediction Result</h2>
-    
-                                                                          
-        <div class="result-item prediction-result">
-    
-            <span>Predicted Annual Salary</span>
-    
-            <strong>{{ prediction }}</strong>
-    
-        </div>
-    
-    </div>
-    
-    {% endif %}
-
-    <!-- Error -->
-
-    {% if error %}
-
-    <div class="error">
-
-        <strong>Error:</strong>
-        {{ error }}
-
-    </div>
-
-    {% endif %}
 
 </div>
 
